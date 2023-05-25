@@ -15,7 +15,7 @@ export class LoginPageComponent implements OnInit{
 
   ngOnInit(): void {
     this.matDialog.open(LoginFormComponent, {
-      disableClose:true
+      // disableClose:true
     })
   }
 

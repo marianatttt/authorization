@@ -1,1 +1,12 @@
-<app-cars></app-cars>
+<app-cars [cars]="cars"></app-cars>
+<mat-paginator
+               (page)="handlePageEvent($event)"
+               [length]="length"
+               [pageSize]="pageSize"
+               [showFirstLastButtons]="showFirstLastButtons"
+               [pageIndex]="pageIndex"
+               aria-label="Select page">
+</mat-paginator>
+
+<router-outlet></router-outlet>
+

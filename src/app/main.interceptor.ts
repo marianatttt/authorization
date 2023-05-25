@@ -5,16 +5,18 @@ import {
   HttpEvent,
   HttpInterceptor, HttpErrorResponse
 } from '@angular/common/http';
-import {catchError, Observable, throwError, switchMap} from 'rxjs';
+import {catchError, Observable, throwError, switchMap, BehaviorSubject, filter, take} from 'rxjs';
 
 import {AuthService} from "./services";
 import {MatDialog} from "@angular/material/dialog";
 import {Router} from "@angular/router";
+import {urls} from "./constants";
 
 @Injectable()
 export class MainInterceptor implements HttpInterceptor {
 
-  isRefreshing = false
+  isRefreshing = false;
+  waitRefreshSubject = new BehaviorSubject<string | null>(null)
 
   constructor(private authService :AuthService, private matDialog : MatDialog, private router: Router) {}
 
@@ -27,8 +29,29 @@ export class MainInterceptor implements HttpInterceptor {
 
     return next.handle(request).pipe(
       catchError((res:HttpErrorResponse)=>{
+
         if(res && res.error && res.status === 401){
-          return this.handle401Error(request, next)
+
+          const refreshToken = this.authService.getRefreshToken()
+          if (!this.isRefreshing && refreshToken){
+            return this.handle401Error(request, next, refreshToken)
+          }
+
+          if (res.url === urls.auth.refresh){
+            this.isRefreshing = false
+            this.authService.deleteToken()
+            this.matDialog.closeAll()
+            this.router.navigate(['auth', 'login'], {queryParams:{sessionExp: true}})
+            return throwError(()=>res)
+          }
+
+          return this.waitRefreshSubject.pipe(
+            filter((token)=> token !== null),
+            take(1),
+            switchMap((token)=>{
+              return next.handle(this.addToken(request, token!))
+            })
+          )
         }
         return throwError(()=> res)
       })
@@ -41,26 +64,16 @@ export class MainInterceptor implements HttpInterceptor {
     })
   }
 
-  handle401Error(request: HttpRequest<unknown>, next: HttpHandler):any{
-    const refreshToken = this.authService.getRefreshToken()
+  handle401Error(request: HttpRequest<unknown>, next: HttpHandler, refreshToken:string):any{
 
-    if(refreshToken && !this.isRefreshing){
       this.isRefreshing = true
       return this.authService.refresh(refreshToken).pipe(
         switchMap((token)=>{
           this.isRefreshing = false
+          this.waitRefreshSubject.next(token.access)
           return next.handle(this.addToken(request, token.access))
-        }),
-        catchError(() => {
-          this.isRefreshing = false
-          this.authService.deleteToken()
-          this.matDialog.closeAll()
-          this.router.navigate(['auth', 'login'])
-          return throwError(()=> new Error('Token invalid or expired'))
         })
       )
-    }
   }
-
 }
 

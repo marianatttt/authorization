@@ -1,8 +1,15 @@
 <mat-toolbar class="toolbar">
 
   <div>My Application</div>
-  <div class="links">
+  <div *ngIf="user">{{user.username}}</div>
+  <div class="links" *ngIf="!user">
     <div routerLink="auth/login" routerLinkActive="active">Login</div>
     <div routerLink="auth/register" routerLinkActive="active">Register</div>
   </div>
+  <div *ngIf="user">
+    <button mat-button (click)="logout()">Logout</button> <!-- Додано кнопку Logout -->
+  </div>
 </mat-toolbar>
+
+
+
