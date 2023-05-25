@@ -1,0 +1,24 @@
+mat-card-content{
+  width: 300px;
+}
+
+mat-card-title{
+  padding: 15px 0 5px 20px;
+
+}
+
+mat-card-content{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.actions{
+  justify-content: right;
+}
+
+.error{
+  padding-left: 15px;
+}
+
+

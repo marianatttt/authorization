@@ -1,0 +1,19 @@
+.links{
+  display: flex;
+}
+
+.links div{
+  padding: 0 7px;
+}
+
+.links div{
+ cursor: pointer;
+}
+
+.toolbar{
+  justify-content: space-between;
+}
+
+.active{
+  color: darkcyan;
+}
