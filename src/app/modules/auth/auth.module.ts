@@ -28,7 +28,6 @@ import { RegisterFormComponent } from './components/register-form/register-form.
     MatInputModule,
     MatButtonModule,
     MatDialogModule
-
   ]
 })
 export class AuthModule { }

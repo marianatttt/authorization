@@ -1,8 +1,9 @@
 import {Component, OnInit} from '@angular/core';
+import {Router} from "@angular/router";
+
 import {AuthService} from "../../services";
 import {IAuth} from "../../interfaces";
-import {Router} from "@angular/router";
-import {Observable} from "rxjs";
+
 
 @Component({
   selector: 'app-header',
@@ -27,7 +28,7 @@ export class HeaderComponent implements OnInit {
   }
 
   logout() {
-    this.authService.deleteToken(); // Викликати метод logout() з AuthService
+    this.authService.deleteToken();
     this.user = null;
     this.router.navigate(['/'])
 
